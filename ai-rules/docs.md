@@ -18,6 +18,19 @@
 
 - Use only the document types defined below; define a type and its required fields here before using it.
 
+### Guide
+
+```yaml
+---
+type: guide
+---
+```
+
+- Use a Guide document for task-oriented setup, operation, and maintenance instructions that do not define product behavior or implementation decisions.
+- State the intended audience, prerequisites, ordered steps, expected outcomes, and relevant failure modes.
+- Keep workflow variants separate only when their prerequisites or outcomes differ.
+- Link to canonical PM, Context, and Glossary documents instead of repeating their content.
+
 ### PM
 
 ```yaml

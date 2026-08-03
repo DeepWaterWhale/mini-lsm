@@ -1,0 +1,149 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang-format
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DMINI_LSM_BUILD_TESTS=OFF
+          -DMINI_LSM_BUILD_BENCHMARKS=OFF
+
+      - name: Check formatting
+        run: cmake --build build --target format-check
+
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{github.workspace}}/build/_deps
+          key: deps-release-${{hashFiles('CMakeLists.txt')}}
+
+      - name: Configure
+        run: >
+          cmake -S . -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DMINI_LSM_BUILD_TESTS=OFF
+
+      - name: Build
+        run: cmake --build build --target mini_lsm mini_lsm_bench --parallel
+
+      - name: Run executable
+        run: ./build/mini_lsm
+
+      - name: Run benchmark
+        run: >
+          ./build/mini_lsm_bench
+          --benchmark_min_time=0.01s
+          --benchmark_format=json
+          --benchmark_out=benchmark_result.json
+
+      - name: Upload benchmark result
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-result
+          path: benchmark_result.json
+
+  asan-ubsan:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      BUILD_DIR: ${{github.workspace}}/build-asan
+      COVERAGE_FILE: ${{github.workspace}}/coverage.xml
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install gcovr
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes gcovr
+
+      - name: Cache GoogleTest
+        uses: actions/cache@v4
+        with:
+          path: ${{env.BUILD_DIR}}/_deps
+          key: deps-asan-${{hashFiles('CMakeLists.txt')}}
+
+      - name: Configure
+        run: >
+          cmake -S . -B ${{env.BUILD_DIR}}
+          -DCMAKE_BUILD_TYPE=Debug
+          -DMINI_LSM_BUILD_BENCHMARKS=OFF
+          -DMINI_LSM_ENABLE_ASAN_UBSAN=ON
+          -DMINI_LSM_ENABLE_COVERAGE=ON
+
+      - name: Build
+        run: cmake --build ${{env.BUILD_DIR}} --target mini_lsm_test --parallel
+
+      - name: Test
+        run: ctest --test-dir ${{env.BUILD_DIR}} --output-on-failure
+
+      - name: Generate coverage report
+        run: >
+          gcovr
+          --root ${{github.workspace}}
+          --filter sources/
+          --xml
+          --output ${{env.COVERAGE_FILE}}
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ${{env.COVERAGE_FILE}}
+          fail_ci_if_error: true
+          use_oidc: true
+
+  tsan:
+    runs-on: ubuntu-24.04
+    env:
+      BUILD_DIR: ${{github.workspace}}/build-tsan
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache GoogleTest
+        uses: actions/cache@v4
+        with:
+          path: ${{env.BUILD_DIR}}/_deps
+          key: deps-tsan-${{hashFiles('CMakeLists.txt')}}
+
+      - name: Configure
+        run: >
+          cmake -S . -B ${{env.BUILD_DIR}}
+          -DCMAKE_BUILD_TYPE=Debug
+          -DMINI_LSM_BUILD_BENCHMARKS=OFF
+          -DMINI_LSM_ENABLE_TSAN=ON
+
+      - name: Build
+        run: cmake --build ${{env.BUILD_DIR}} --target mini_lsm_test --parallel
+
+      - name: Test
+        env:
+          TSAN_OPTIONS: halt_on_error=1:detect_deadlocks=1
+        run: ctest --test-dir ${{env.BUILD_DIR}} --output-on-failure

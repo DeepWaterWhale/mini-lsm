@@ -47,10 +47,15 @@ build-*/
 # CMake generated files
 CMakeFiles/
 CMakeCache.txt
+CMakeLists.txt.user
+CMakeScripts/
+CMakeUserPresets.json
+CTestTestfile.cmake
 cmake_install.cmake
 Makefile
 install_manifest.txt
 compile_commands.json
+_deps/
 
 # Temporary files
 *.tmp
@@ -67,3 +72,8 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+coverage.xml
+benchmark_result.json
+
+# IDEs
+cmake-build-*/
