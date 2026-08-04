@@ -6,4 +6,4 @@ namespace mini_lsm {
 
 int run() noexcept { return EXIT_SUCCESS; }
 
-}  // namespace mini_lsm
+}

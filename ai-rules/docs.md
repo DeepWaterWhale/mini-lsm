@@ -2,7 +2,7 @@
 
 - Never restate implementation logic in documentation; the code is the sole source of truth for all implementation logic.
 - Require every documentation file to declare exactly one supported document `type` in YAML frontmatter.
-- Treat PM documents as the source of truth for intended functionality, Context documents as the source of truth for implementation decisions, and the Glossary document as the source of truth for terminology.
+- Treat PM documents as the source of truth for intended functionality, Context documents as the source of truth for implementation decisions, Operation documents as the source of truth for executable workflows, and the Glossary document as the source of truth for terminology.
 - Treat every Markdown italic span in documentation as a glossary term reference; never use Markdown italics for emphasis or any other purpose.
 - Update documentation whenever behavior, interfaces, configuration, workflows, constraints, or prerequisites change.
 - Describe current behavior only; remove or revise stale, speculative, or contradictory guidance.
@@ -26,10 +26,25 @@ type: guide
 ---
 ```
 
-- Use a Guide document for task-oriented setup, operation, and maintenance instructions that do not define product behavior or implementation decisions.
-- State the intended audience, prerequisites, ordered steps, expected outcomes, and relevant failure modes.
-- Keep workflow variants separate only when their prerequisites or outcomes differ.
-- Link to canonical PM, Context, and Glossary documents instead of repeating their content.
+- Use a Guide document for orientation and navigation that do not define product behavior, implementation decisions, or executable workflows.
+- Keep Guide content concise and link to canonical PM, Context, Operation, and Glossary documents instead of repeating their content.
+- Never place runnable command sequences in a Guide document.
+
+### Operation
+
+```yaml
+---
+type: operation
+---
+```
+
+- Use an Operation document for executable setup, build, test, deployment, maintenance, and troubleshooting workflows.
+- Keep each Operation document focused on a cohesive set of workflows for one system or component.
+- State prerequisites and the required starting directory or system state before listing commands.
+- Keep commands copyable, ordered, and synchronized with the configuration that defines them.
+- State the expected outcome and document only actionable failure recovery that differs from the normal workflow.
+- Keep workflow variants separate only when their prerequisites, commands, or outcomes differ.
+- Store runnable command sequences in Operation documents, not in Guide, PM, Context, or Glossary documents.
 
 ### PM
 

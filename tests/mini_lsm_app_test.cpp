@@ -10,4 +10,4 @@ TEST(MiniLsmAppTest, Run_NoState_ReturnsSuccess) {
   EXPECT_EQ(run(), EXIT_SUCCESS);
 }
 
-}  // namespace mini_lsm
+}
