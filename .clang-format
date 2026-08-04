@@ -1,0 +1,5 @@
+BasedOnStyle: Google
+DerivePointerAlignment: false
+FixNamespaceComments: false
+IndentWidth: 2
+PointerAlignment: Left

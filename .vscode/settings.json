@@ -1,0 +1,31 @@
+{
+  "C_Cpp.intelliSenseEngine": "disabled",
+  "clangd.arguments": [
+    "--compile-commands-dir=${workspaceFolder}/build"
+  ],
+  "cmake.buildDirectory": "${workspaceFolder}/build",
+  "cmake.configureOnOpen": false,
+  "files.associations": {
+    "*.c++": "cpp",
+    "*.cc": "cpp",
+    "*.ccm": "cpp",
+    "*.cpp": "cpp",
+    "*.cppm": "cpp",
+    "*.cxx": "cpp",
+    "*.cxxm": "cpp",
+    "*.h": "cpp",
+    "*.h++": "cpp",
+    "*.hh": "cpp",
+    "*.hpp": "cpp",
+    "*.hxx": "cpp",
+    "*.inl": "cpp",
+    "*.ipp": "cpp",
+    "*.ixx": "cpp",
+    "*.tcc": "cpp",
+    "*.tpp": "cpp"
+  },
+  "[cpp]": {
+    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+    "editor.formatOnSave": true
+  }
+}
